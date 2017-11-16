@@ -13,17 +13,18 @@ func init() {
 }
 
 type Test struct {
-	FieldA *impl.LudwiegUint8
-	FieldB *impl.LudwiegUint32
-	FieldC *impl.LudwiegUint64
-	FieldD *impl.LudwiegFloat64
-	FieldE *impl.LudwiegString
-	FieldF []byte
-	FieldG *impl.LudwiegBool
-	FieldH *impl.LudwiegUUID
-	FieldY *impl.LudwiegAny
-	FieldZ [](*impl.LudwiegString)
-	FieldI *TestSub
+	FieldA  *impl.LudwiegUint8
+	FieldB  *impl.LudwiegUint32
+	FieldC  *impl.LudwiegUint64
+	FieldD  *impl.LudwiegFloat64
+	FieldE  *impl.LudwiegString
+	FieldF  []byte
+	FieldG  *impl.LudwiegBool
+	FieldH  *impl.LudwiegUUID
+	FieldY  *impl.LudwiegAny
+	FieldZ  [](*impl.LudwiegString)
+	FieldZA [](*CustomType)
+	FieldI  *TestSub
 }
 
 func (t Test) LudwiegID() byte {
@@ -42,6 +43,7 @@ func (t Test) LudwiegMeta() []impl.LudwiegTypeAnnotation {
 		{Type: impl.TypeUUID},
 		{Type: impl.TypeAny},
 		{Type: impl.TypeArray, ArraySize: "*", ArrayType: impl.TypeString},
+		impl.ArrayOf(CustomType{}),
 		{Type: impl.TypeStruct},
 	}
 }
@@ -68,18 +70,29 @@ func (t TestSubOther) LudwiegMeta() []impl.LudwiegTypeAnnotation {
 	}
 }
 
+type CustomType struct {
+	FieldV *impl.LudwiegString
+}
+
+func (t CustomType) LudwiegMeta() []impl.LudwiegTypeAnnotation {
+	return []impl.LudwiegTypeAnnotation{
+		{Type: impl.TypeString},
+	}
+}
+
 func TestEncoderDecoder(t *testing.T) {
 	obj := Test{
-		FieldA: impl.Uint8(27),
-		FieldB: impl.Uint32(28),
-		FieldC: impl.Uint64(29),
-		FieldD: impl.Float64(30.2),
-		FieldE: impl.String("String"),
-		FieldF: []byte{0x27, 0x24, 0x50},
-		FieldG: impl.Bool(true),
-		FieldH: impl.UUID("3232ee42c2f24baf841318335b4d5640"),
-		FieldY: impl.Any(impl.String("Any field retaining a string")),
-		FieldZ: []*impl.LudwiegString{impl.String("Robin"), impl.String("Tom")},
+		FieldA:  impl.Uint8(27),
+		FieldB:  impl.Uint32(28),
+		FieldC:  impl.Uint64(29),
+		FieldD:  impl.Float64(30.2),
+		FieldE:  impl.String("String"),
+		FieldF:  []byte{0x27, 0x24, 0x50},
+		FieldG:  impl.Bool(true),
+		FieldH:  impl.UUID("3232ee42c2f24baf841318335b4d5640"),
+		FieldY:  impl.Any(impl.String("Any field retaining a string")),
+		FieldZ:  []*impl.LudwiegString{impl.String("Robin"), impl.String("Tom")},
+		FieldZA: []*CustomType{{impl.String("hello")}, {impl.String("friend")}},
 		FieldI: &TestSub{
 			FieldJ: impl.String("Structure"),
 			FieldK: &TestSubOther{
@@ -121,6 +134,9 @@ func TestEncoderDecoder(t *testing.T) {
 			assert.Equal(t, "Structure", r.FieldI.FieldJ.Value)
 			assert.NotNil(t, r.FieldI.FieldK)
 			assert.Equal(t, "Other Structure", r.FieldI.FieldK.FieldL.Value)
+			assert.NotNil(t, r.FieldZA)
+			assert.Equal(t, "hello", r.FieldZA[0].FieldV.Value)
+			assert.Equal(t, "friend", r.FieldZA[1].FieldV.Value)
 			return
 		}
 	}

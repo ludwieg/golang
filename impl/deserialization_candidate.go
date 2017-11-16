@@ -66,22 +66,50 @@ func createObjectFromType(annotations []LudwiegTypeAnnotation, t reflect.Type, v
 			// This will be slighlty trickier, yet feasible.
 			// We will recurse the call to createObjectFromType, but
 			// we need annotations and type information.
-			structInstance := field.Type.Elem()
-			structIndirect := reflect.Indirect(reflect.New(structInstance))
-			metaValue := structIndirect.
-				MethodByName("LudwiegMeta").
-				Call([]reflect.Value{})[0].
-				Interface().([]LudwiegTypeAnnotation)
+			metaValue, err := extractAnnotationsFromType(field.Type)
+			if err != nil {
+				panic(err)
+			}
 			val := createObjectFromType(metaValue, field.Type.Elem(), rawValue.([]interface{}))
 			fieldValue.Set(reflect.ValueOf(val))
 		case TypeArray:
-			curArr := rawValue.([]interface{})
-			newArr := reflect.MakeSlice(field.Type, len(curArr), len(curArr))
-			for i, v := range curArr {
-				ptr := newArr.Index(i)
-				ptr.Set(reflect.ValueOf(v))
+			var curArr []interface{}
+			// Empty arrays will cause rawValue to be nil. Here we can ensure
+			// the array being accessed (and cast) is not nil.
+			if rawValue == nil {
+				curArr = []interface{}{}
+			} else {
+				curArr = rawValue.([]interface{})
 			}
-			fieldValue.Set(newArr)
+
+			// Custom-type arrays need extra attention here.
+			if fieldMeta.ArrayType == TypeStruct {
+				// At this point, we may have slices of slices, and each group
+				// of slices must be used to instantiate a new object that will
+				// be placed inside the slice.
+				newArr := reflect.MakeSlice(reflect.SliceOf(fieldMeta.ArrayUserType), len(curArr), len(curArr))
+				annotations, err := extractAnnotationsFromType(fieldMeta.ArrayUserType)
+				if err != nil {
+					panic(err)
+				}
+				for i, v := range curArr {
+					// The next line uses Elem() on ArrayUserType, since it will
+					// always be cast to a ptr using PtrTo.
+					val := createObjectFromType(annotations, fieldMeta.ArrayUserType.Elem(), v.([]interface{}))
+					ptr := newArr.Index(i)
+					ptr.Set(reflect.ValueOf(val))
+				}
+
+				fieldValue.Set(newArr)
+			} else {
+				newArr := reflect.MakeSlice(field.Type, len(curArr), len(curArr))
+				for i, v := range curArr {
+					ptr := newArr.Index(i)
+					ptr.Set(reflect.ValueOf(v))
+				}
+
+				fieldValue.Set(newArr)
+			}
 		case TypeBlob:
 			fieldValue.Set(rawPointer)
 		}
@@ -147,4 +175,21 @@ func readSize(offset *int, buffer []byte) uint64 {
 	default:
 		panic(fmt.Errorf("unknown size prefix %#v", b))
 	}
+}
+
+func extractAnnotationsFromType(t reflect.Type) ([]LudwiegTypeAnnotation, error) {
+	serializable := reflect.TypeOf((*Serializable)(nil)).Elem()
+	if !t.Implements(serializable) {
+		return nil, fmt.Errorf("type %s does not implement Serializable", t.String())
+	}
+
+	if t.Kind() != reflect.Struct {
+		t = t.Elem()
+	}
+
+	structIndirect := reflect.Indirect(reflect.New(t))
+	return structIndirect.
+		MethodByName("LudwiegMeta").
+		Call([]reflect.Value{})[0].
+		Interface().([]LudwiegTypeAnnotation), nil
 }
