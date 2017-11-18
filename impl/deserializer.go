@@ -11,20 +11,22 @@ type registeredPackage struct {
 	meta       []LudwiegTypeAnnotation
 }
 
-// RegisterPackage is responsible for registering a known package under a
+// RegisterPackages is responsible for registering a known package under a
 // message ID. It is then used afterwards to decode incoming messages. This
 // method is called automatically, when generating sources using the "ludco"
 // command line utility.
-func RegisterPackage(pkg SerializablePackage) {
-	id := pkg.LudwiegID()
-	if _, ok := registeredPackages[id]; ok {
-		panic(fmt.Errorf("illegal attempt to register two packages with same id: %#v", id))
-	}
+func RegisterPackages(pkgs ...SerializablePackage) {
+	for _, pkg := range pkgs {
+		id := pkg.LudwiegID()
+		if _, ok := registeredPackages[id]; ok {
+			panic(fmt.Errorf("illegal attempt to register two packages with same id: %#v", id))
+		}
 
-	registeredPackages[id] = registeredPackage{
-		id:         id,
-		meta:       pkg.LudwiegMeta(),
-		nativeType: reflect.TypeOf(pkg),
+		registeredPackages[id] = registeredPackage{
+			id:         id,
+			meta:       pkg.LudwiegMeta(),
+			nativeType: reflect.TypeOf(pkg),
+		}
 	}
 }
 
