@@ -9,8 +9,13 @@ import (
 )
 
 func init() {
-	impl.RegisterPackage(Test{})
+	impl.RegisterPackages(Test{}, Fieldless{})
 }
+
+type Fieldless struct{}
+
+func (t Fieldless) LudwiegID() byte                           { return 0x02 }
+func (t Fieldless) LudwiegMeta() []impl.LudwiegTypeAnnotation { return []impl.LudwiegTypeAnnotation{} }
 
 type Test struct {
 	FieldA  *impl.LudwiegUint8
@@ -142,4 +147,24 @@ func TestEncoderDecoder(t *testing.T) {
 	}
 
 	t.Errorf("Decoding failed.")
+}
+
+func TestFieldlessPackage(t *testing.T) {
+	obj := Fieldless{}
+	buf, err := impl.Serialize(obj, 0x27)
+	if err != nil {
+		t.Error(err)
+	}
+	d := impl.Deserializer{}
+	for _, b := range buf.Bytes() {
+		if r := d.Feed(b); r != nil {
+			v, err := r.Deserialize()
+			if err != nil {
+				t.Error(err)
+			}
+			if _, ok := v.(*Fieldless); !ok {
+				assert.Fail(t, "Invalid deserialization result")
+			}
+		}
+	}
 }
