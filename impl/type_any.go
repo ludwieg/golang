@@ -32,6 +32,9 @@ func serializeAny(c *serializationCandidate, b *bytes.Buffer) error {
 
 		// Here we will need some helpers. Bear with me:
 		serializeArray := func(t ProtocolType) error {
+			if reflectValue.Len() == 0 {
+				return fmt.Errorf("type Any cannot serialize empty array")
+			}
 			meta := metaTypeFromByte(byte(TypeArray))
 			return serializeArray(&serializationCandidate{
 				annotation: &LudwiegTypeAnnotation{ArrayType: t, ArraySize: "*", Type: TypeArray},
@@ -42,6 +45,9 @@ func serializeAny(c *serializationCandidate, b *bytes.Buffer) error {
 		}
 
 		serializeSimple := func(f serializerFunc, t ProtocolType) error {
+			if t == TypeStruct {
+				return fmt.Errorf("type Any cannot retain an struct")
+			}
 			meta := metaTypeFromByte(byte(t))
 			return f(&serializationCandidate{
 				annotation: &LudwiegTypeAnnotation{Type: t},
