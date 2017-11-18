@@ -17,6 +17,15 @@ type Fieldless struct{}
 func (t Fieldless) LudwiegID() byte                           { return 0x02 }
 func (t Fieldless) LudwiegMeta() []impl.LudwiegTypeAnnotation { return []impl.LudwiegTypeAnnotation{} }
 
+type AnyTestStruct struct {
+	FieldP *impl.LudwiegAny
+}
+
+func (t AnyTestStruct) LudwiegID() byte { return 0x03 }
+func (t AnyTestStruct) LudwiegMeta() []impl.LudwiegTypeAnnotation {
+	return []impl.LudwiegTypeAnnotation{{Type: impl.TypeAny}}
+}
+
 type Test struct {
 	FieldA  *impl.LudwiegUint8
 	FieldB  *impl.LudwiegUint32
@@ -32,9 +41,7 @@ type Test struct {
 	FieldI  *TestSub
 }
 
-func (t Test) LudwiegID() byte {
-	return 0x01
-}
+func (t Test) LudwiegID() byte { return 0x01 }
 
 func (t Test) LudwiegMeta() []impl.LudwiegTypeAnnotation {
 	return []impl.LudwiegTypeAnnotation{
@@ -166,5 +173,37 @@ func TestFieldlessPackage(t *testing.T) {
 				assert.Fail(t, "Invalid deserialization result")
 			}
 		}
+	}
+}
+
+func TestArrayInAnyField(t *testing.T) {
+	obj := AnyTestStruct{
+		FieldP: impl.Any([]*CustomType{{impl.String("hello")}, {impl.String("friend")}}),
+	}
+	_, err := impl.Serialize(obj, 0x66)
+	if err == nil {
+		t.Error("Serializer allowed an Any field to retain an Array of Structs")
+	}
+}
+
+func TestEmptyArrayInAny(t *testing.T) {
+	obj := AnyTestStruct{
+		FieldP: impl.Any([]*impl.LudwiegString{}),
+	}
+	_, err := impl.Serialize(obj, 0x66)
+	if err == nil {
+		t.Error("Serializer allowed an Any field to retain an empty array")
+	}
+}
+
+func TestStructInAnyField(t *testing.T) {
+	obj := AnyTestStruct{
+		FieldP: impl.Any(&TestSubOther{
+			FieldL: impl.String("Other Structure"),
+		}),
+	}
+	_, err := impl.Serialize(obj, 0x66)
+	if err == nil {
+		t.Error("Serializer allowed an Any field to retain a struct")
 	}
 }
