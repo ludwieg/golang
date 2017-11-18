@@ -52,11 +52,13 @@ func serialize(buf *bytes.Buffer, c *serializationCandidate) error {
 	value := c.value
 	annotation := c.annotation
 
-	if value.IsNil() && c.writeType {
-		// Empty values are handled by just writing the protocol type to the
-		// stream with the IsEmpty bit set.
-		c.meta.Empty = true
-		buf.WriteByte(c.meta.byte())
+	if value.IsNil() {
+		if c.writeType {
+			// Empty values are handled by just writing the protocol type to the
+			// stream with the IsEmpty bit set.
+			c.meta.Empty = true
+			buf.WriteByte(c.meta.byte())
+		}
 		return nil
 	}
 
