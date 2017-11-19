@@ -57,7 +57,7 @@ var knownTypes = []ProtocolType{
 type lengthEncoding byte
 
 const (
-	_ lengthEncoding = iota
+	lengthEncodingEmpty lengthEncoding = iota
 	lengthEncodingUint8
 	lengthEncodingUint16
 	lengthEncodingUint32

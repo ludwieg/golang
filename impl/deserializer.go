@@ -112,10 +112,13 @@ func (d *Deserializer) Feed(b byte) *DeserializationCandidate {
 		d.readBytes++
 		d.state = statusPackageSizePrelude
 	case statusPackageSizePrelude:
-		if b < byte(lengthEncodingUint8) || b > byte(lengthEncodingUint64) {
+		if b > byte(lengthEncodingUint64) {
 			d.reset()
 		}
 		switch lengthEncoding(b) {
+		case lengthEncodingEmpty:
+			defer d.reset()
+			return d.candidate()
 		case lengthEncodingUint8:
 			d.tmpBuffer = make([]byte, 0, 1)
 		case lengthEncodingUint16:
@@ -150,11 +153,15 @@ func (d *Deserializer) Feed(b byte) *DeserializationCandidate {
 		d.readBytes++
 		if len(d.tmpBuffer) == cap(d.tmpBuffer) {
 			defer d.reset()
-			return &DeserializationCandidate{
-				buffer:      d.tmpBuffer,
-				MessageMeta: d.msgMeta,
-			}
+			return d.candidate()
 		}
 	}
 	return nil
+}
+
+func (d *Deserializer) candidate() *DeserializationCandidate {
+	return &DeserializationCandidate{
+		buffer:      d.tmpBuffer,
+		MessageMeta: d.msgMeta,
+	}
 }

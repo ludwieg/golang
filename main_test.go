@@ -172,8 +172,10 @@ func TestFieldlessPackage(t *testing.T) {
 			if _, ok := v.(*Fieldless); !ok {
 				assert.Fail(t, "Invalid deserialization result")
 			}
+			return
 		}
 	}
+	t.Errorf("Decoding failed")
 }
 
 func TestArrayInAnyField(t *testing.T) {

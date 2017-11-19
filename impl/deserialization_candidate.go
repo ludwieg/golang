@@ -156,6 +156,8 @@ func readSize(offset *int, buffer []byte) uint64 {
 	b := buffer[incr(offset)]
 
 	switch lengthEncoding(b) {
+	case lengthEncodingEmpty:
+		return uint64(0)
 	case lengthEncodingUint8:
 		buf := buffer[*offset]
 		incr(offset)

@@ -50,6 +50,8 @@ func readFloat64(b []byte) float64 {
 
 func writeSize(size uint64, b *bytes.Buffer) {
 	switch {
+	case size == 0:
+		b.WriteByte(byte(lengthEncodingEmpty))
 	case size <= math.MaxUint8:
 		b.WriteByte(byte(lengthEncodingUint8))
 		b.WriteByte(byte(size))
