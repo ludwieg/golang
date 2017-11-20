@@ -30,7 +30,7 @@ type Test struct {
 	FieldA  *impl.LudwiegUint8
 	FieldB  *impl.LudwiegUint32
 	FieldC  *impl.LudwiegUint64
-	FieldD  *impl.LudwiegFloat64
+	FieldD  *impl.LudwiegDouble
 	FieldE  *impl.LudwiegString
 	FieldF  []byte
 	FieldG  *impl.LudwiegBool
@@ -48,7 +48,7 @@ func (t Test) LudwiegMeta() []impl.LudwiegTypeAnnotation {
 		{Type: impl.TypeUint8},
 		{Type: impl.TypeUint32},
 		{Type: impl.TypeUint64},
-		{Type: impl.TypeFloat64},
+		{Type: impl.TypeDouble},
 		{Type: impl.TypeString},
 		{Type: impl.TypeBlob},
 		{Type: impl.TypeBool},
@@ -97,7 +97,7 @@ func TestEncoderDecoder(t *testing.T) {
 		FieldA:  impl.Uint8(27),
 		FieldB:  impl.Uint32(28),
 		FieldC:  impl.Uint64(29),
-		FieldD:  impl.Float64(30.2),
+		FieldD:  impl.Double(30.2),
 		FieldE:  impl.String("String"),
 		FieldF:  []byte{0x27, 0x24, 0x50},
 		FieldG:  impl.Bool(true),

@@ -24,8 +24,8 @@ const (
 	// TypeUint64 represents an Uint64 type
 	TypeUint64 = (0x03 << 2)
 
-	// TypeFloat64 represents a Float64 type
-	TypeFloat64 = (0x04 << 2)
+	// TypeDouble represents a Float64 type
+	TypeDouble = (0x04 << 2)
 
 	// TypeString represents a String type
 	TypeString = (0x05 << 2) | 0x1
@@ -50,7 +50,7 @@ const (
 )
 
 var knownTypes = []ProtocolType{
-	TypeUint8, TypeUint32, TypeUint64, TypeFloat64, TypeString,
+	TypeUint8, TypeUint32, TypeUint64, TypeDouble, TypeString,
 	TypeBlob, TypeBool, TypeArray, TypeUUID, TypeAny, TypeStruct,
 }
 

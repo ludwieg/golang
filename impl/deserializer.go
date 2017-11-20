@@ -41,7 +41,7 @@ func init() {
 		TypeUint8:   decodeUint8,
 		TypeUint32:  decodeUint32,
 		TypeUint64:  decodeUint64,
-		TypeFloat64: decodeFloat64,
+		TypeDouble:  decodeDouble,
 		TypeString:  decodeString,
 		TypeBlob:    decodeBlob,
 		TypeBool:    decodeBool,

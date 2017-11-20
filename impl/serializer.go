@@ -73,8 +73,8 @@ func serialize(buf *bytes.Buffer, c *serializationCandidate) error {
 		serializer = serializeUint32
 	case TypeUint64:
 		serializer = serializeUint64
-	case TypeFloat64:
-		serializer = serializeFloat64
+	case TypeDouble:
+		serializer = serializeDouble
 	case TypeString:
 		serializer = serializeString
 	case TypeBlob:

@@ -65,8 +65,8 @@ func serializeAny(c *serializationCandidate, b *bytes.Buffer) error {
 			err = serializeSimple(serializeUint32, TypeUint32)
 		case *LudwiegUint64:
 			err = serializeSimple(serializeUint64, TypeUint64)
-		case *LudwiegFloat64:
-			err = serializeSimple(serializeFloat64, TypeFloat64)
+		case *LudwiegDouble:
+			err = serializeSimple(serializeDouble, TypeDouble)
 		case *LudwiegString:
 			err = serializeSimple(serializeString, TypeString)
 		case *LudwiegUUID:
@@ -81,8 +81,8 @@ func serializeAny(c *serializationCandidate, b *bytes.Buffer) error {
 			err = serializeArray(TypeUint32)
 		case []*LudwiegUint64:
 			err = serializeArray(TypeUint64)
-		case []*LudwiegFloat64:
-			err = serializeArray(TypeFloat64)
+		case []*LudwiegDouble:
+			err = serializeArray(TypeDouble)
 		case []*LudwiegString:
 			err = serializeArray(TypeString)
 		case []*LudwiegUUID:

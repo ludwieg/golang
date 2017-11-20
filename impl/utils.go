@@ -37,14 +37,14 @@ func readUint64(b []byte) uint64 {
 	return binary.LittleEndian.Uint64(b)
 }
 
-func writeFloat64(v float64, b *bytes.Buffer) {
+func writeDouble(v float64, b *bytes.Buffer) {
 	bits := math.Float64bits(v)
 	buf := make([]byte, 8)
 	binary.LittleEndian.PutUint64(buf, bits)
 	b.Write(buf)
 }
 
-func readFloat64(b []byte) float64 {
+func readDouble(b []byte) float64 {
 	return math.Float64frombits(readUint64(b))
 }
 
