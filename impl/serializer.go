@@ -89,6 +89,8 @@ func serialize(buf *bytes.Buffer, c *serializationCandidate) error {
 		serializer = serializeStruct
 	case TypeAny:
 		serializer = serializeAny
+	case TypeDynInt:
+		serializer = serializeDynInt
 	}
 
 	if serializer == nil {

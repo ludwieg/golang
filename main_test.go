@@ -39,6 +39,7 @@ type Test struct {
 	FieldZ  [](*impl.LudwiegString)
 	FieldZA [](*CustomType)
 	FieldI  *TestSub
+	FieldJ  *impl.LudwiegDynInt
 }
 
 func (t Test) LudwiegID() byte { return 0x01 }
@@ -57,6 +58,7 @@ func (t Test) LudwiegMeta() []impl.LudwiegTypeAnnotation {
 		{Type: impl.TypeArray, ArraySize: "*", ArrayType: impl.TypeString},
 		impl.ArrayOf(CustomType{}),
 		{Type: impl.TypeStruct},
+		{Type: impl.TypeDynInt},
 	}
 }
 
@@ -111,6 +113,7 @@ func TestEncoderDecoder(t *testing.T) {
 				FieldL: impl.String("Other Structure"),
 			},
 		},
+		FieldJ: impl.DynInt(27),
 	}
 
 	buf, err := impl.Serialize(obj, 0x01)
@@ -149,6 +152,8 @@ func TestEncoderDecoder(t *testing.T) {
 			assert.NotNil(t, r.FieldZA)
 			assert.Equal(t, "hello", r.FieldZA[0].FieldV.Value)
 			assert.Equal(t, "friend", r.FieldZA[1].FieldV.Value)
+			assert.Equal(t, impl.DynIntValueKindUint8, r.FieldJ.UnderlyingType)
+			assert.Equal(t, 27, r.FieldJ.Int())
 			return
 		}
 	}

@@ -57,7 +57,7 @@ func createObjectFromType(annotations []LudwiegTypeAnnotation, t reflect.Type, v
 		fieldValue := ptr.Field(i)
 
 		switch fieldMeta.Type {
-		case TypeUint8, TypeUint32, TypeUint64, TypeDouble, TypeString, TypeBool, TypeUUID, TypeAny:
+		case TypeUint8, TypeUint32, TypeUint64, TypeDouble, TypeString, TypeBool, TypeUUID, TypeAny, TypeDynInt:
 			if rawPointer.IsNil() {
 				continue
 			}

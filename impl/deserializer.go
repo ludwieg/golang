@@ -49,6 +49,7 @@ func init() {
 		TypeAny:     decodeAny,
 		TypeArray:   decodeArray,
 		TypeStruct:  decodeStruct,
+		TypeDynInt:  decodeDynInt,
 	}
 }
 

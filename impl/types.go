@@ -47,11 +47,16 @@ const (
 
 	// TypeStruct is used internally to identify fields containing structs
 	TypeStruct = (0x0B << 2) | 0x1
+
+	// TypeDynInt represents an Integer value that may assume several sizes and
+	// precisions (byte, uint16, uint32, uint64, float32, float64)
+	TypeDynInt = (0x0C << 2)
 )
 
 var knownTypes = []ProtocolType{
 	TypeUint8, TypeUint32, TypeUint64, TypeDouble, TypeString,
 	TypeBlob, TypeBool, TypeArray, TypeUUID, TypeAny, TypeStruct,
+	TypeDynInt,
 }
 
 type lengthEncoding byte
@@ -62,4 +67,45 @@ const (
 	lengthEncodingUint16
 	lengthEncodingUint32
 	lengthEncodingUint64
+)
+
+// DynIntValueKind represents which kind the current retained value have. It may
+// be safe to assume larger values than the one returned, but any value smaller
+// than the current one will cause an overflow
+type DynIntValueKind byte
+
+const (
+
+	// DynIntValueKindInvalid is used internally to represent an invalid value
+	DynIntValueKindInvalid DynIntValueKind = iota
+
+	// DynIntValueKindUint8 represents an 8-bit unsigned integer
+	DynIntValueKindUint8
+
+	// DynIntValueKindUint16 represents a 16-bit unsigned integer
+	DynIntValueKindUint16
+
+	// DynIntValueKindUint32 represents a 32-bit unsigned integer
+	DynIntValueKindUint32
+
+	// DynIntValueKindUint64 represents a 64-bit unsigned integer
+	DynIntValueKindUint64
+
+	// DynIntValueKindInt8 represents an 8-bit integer
+	DynIntValueKindInt8
+
+	// DynIntValueKindInt16 represents a 16-bit integer
+	DynIntValueKindInt16
+
+	// DynIntValueKindInt32 represents a 32-bit integer
+	DynIntValueKindInt32
+
+	// DynIntValueKindInt64 represents a 64-bit integer
+	DynIntValueKindInt64
+
+	// DynIntValueKindFloat32 represents a 32-bit float value
+	DynIntValueKindFloat32
+
+	// DynIntValueKindFloat64 represents an 64-bit float value
+	DynIntValueKindFloat64
 )
