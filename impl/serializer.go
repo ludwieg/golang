@@ -54,14 +54,14 @@ func SerializeNonMessage(p Serializable) (bufPtr *bytes.Buffer, err error) {
 	tmpBuf := bytes.Buffer{}
 	value := reflect.ValueOf(p)
 	err = serializeStruct(&serializationCandidate{
-		isRoot: false,
+		isRoot:    false,
 		writeType: true,
-		value: &value,
+		value:     &value,
 		meta: &metaProtocolByte{
-			Empty: false,
-			Known: true,
+			Empty:          false,
+			Known:          true,
 			LengthPrefixed: true,
-			Type: TypeStruct,
+			Type:           TypeStruct,
 		},
 	}, &tmpBuf)
 
