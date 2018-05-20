@@ -63,7 +63,7 @@ func createObjectFromType(annotations []LudwiegTypeAnnotation, t reflect.Type, v
 			}
 			fieldValue.Set(rawPointer)
 		case TypeStruct:
-			// This will be slighlty trickier, yet feasible.
+			// This will be slightly trickier, yet feasible.
 			// We will recurse the call to createObjectFromType, but
 			// we need annotations and type information.
 			metaValue, err := extractAnnotationsFromType(field.Type)

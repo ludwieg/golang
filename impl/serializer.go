@@ -7,12 +7,12 @@ import (
 )
 
 func illegalSetterValueError(t string) error {
-	return fmt.Errorf("Illegal attempt to set invalid type into protocol structure of type %s", t)
+	return fmt.Errorf("illegal attempt to set invalid type into protocol structure of type %s", t)
 }
 
-// Serialize serializes a given SerializablePackage and messageID into a
-// transferrable byte buffer
-func Serialize(p SerializablePackage, messageID byte) (bufPtr *bytes.Buffer, err error) {
+// SerializeMessage serializes a given SerializablePackage and messageID into a
+// transferable byte buffer
+func SerializeMessage(p SerializablePackage, messageID byte) (bufPtr *bytes.Buffer, err error) {
 	var buf bytes.Buffer
 
 	// 1. Write Magic Bytes
@@ -46,6 +46,28 @@ func Serialize(p SerializablePackage, messageID byte) (bufPtr *bytes.Buffer, err
 	return &buf, err
 }
 
+// SerializeNonMessage allows a non-message object (preferable a Struct) to be
+// serialised without the overhead of a message header. This also does not offer
+// any security that messages do, such as protocol versions and such. Use at your
+// own risk.
+func SerializeNonMessage(p Serializable) (bufPtr *bytes.Buffer, err error) {
+	tmpBuf := bytes.Buffer{}
+	value := reflect.ValueOf(p)
+	err = serializeStruct(&serializationCandidate{
+		isRoot: false,
+		writeType: true,
+		value: &value,
+		meta: &metaProtocolByte{
+			Empty: false,
+			Known: true,
+			LengthPrefixed: true,
+			Type: TypeStruct,
+		},
+	}, &tmpBuf)
+
+	return &tmpBuf, err
+}
+
 type serializerFunc func(c *serializationCandidate, b *bytes.Buffer) error
 
 func serialize(buf *bytes.Buffer, c *serializationCandidate) error {
@@ -66,7 +88,7 @@ func serialize(buf *bytes.Buffer, c *serializationCandidate) error {
 
 	switch annotation.Type {
 	case TypeUnknown:
-		return fmt.Errorf("Cannot serialize unknown type")
+		return fmt.Errorf("cannot serialize unknown type")
 	case TypeUint8:
 		serializer = serializeUint8
 	case TypeUint32:

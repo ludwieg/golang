@@ -166,3 +166,14 @@ func (d *Deserializer) candidate() *DeserializationCandidate {
 		MessageMeta: d.msgMeta,
 	}
 }
+
+// DeserializeNonMessage converts a previously serialised object (through
+// SerializeNonMessage) to be converted back to a known type.
+// Returns a pointer to the object with the provided type, or an error.
+func DeserializeNonMessage(data []byte, into Serializable) (interface{}, error) {
+	fields, err := deserialize(data)
+	if err != nil {
+		return nil, err
+	}
+	return createObjectFromType(into.LudwiegMeta(), reflect.TypeOf(into), fields[0].([]interface{})), nil
+}

@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	impl "github.com/ludwieg/golang/impl"
+	"github.com/ludwieg/golang/impl"
 )
 
 func init() {
@@ -116,7 +116,7 @@ func TestEncoderDecoder(t *testing.T) {
 		FieldJ: impl.DynInt(27),
 	}
 
-	buf, err := impl.Serialize(obj, 0x01)
+	buf, err := impl.SerializeMessage(obj, 0x01)
 	if err != nil {
 		t.Error(err)
 	}
@@ -163,7 +163,7 @@ func TestEncoderDecoder(t *testing.T) {
 
 func TestFieldlessPackage(t *testing.T) {
 	obj := Fieldless{}
-	buf, err := impl.Serialize(obj, 0x27)
+	buf, err := impl.SerializeMessage(obj, 0x27)
 	if err != nil {
 		t.Error(err)
 	}
@@ -187,7 +187,7 @@ func TestArrayInAnyField(t *testing.T) {
 	obj := AnyTestStruct{
 		FieldP: impl.Any([]*CustomType{{impl.String("hello")}, {impl.String("friend")}}),
 	}
-	_, err := impl.Serialize(obj, 0x66)
+	_, err := impl.SerializeMessage(obj, 0x66)
 	if err == nil {
 		t.Error("Serializer allowed an Any field to retain an Array of Structs")
 	}
@@ -197,7 +197,7 @@ func TestEmptyArrayInAny(t *testing.T) {
 	obj := AnyTestStruct{
 		FieldP: impl.Any([]*impl.LudwiegString{}),
 	}
-	_, err := impl.Serialize(obj, 0x66)
+	_, err := impl.SerializeMessage(obj, 0x66)
 	if err == nil {
 		t.Error("Serializer allowed an Any field to retain an empty array")
 	}
@@ -209,8 +209,48 @@ func TestStructInAnyField(t *testing.T) {
 			FieldL: impl.String("Other Structure"),
 		}),
 	}
-	_, err := impl.Serialize(obj, 0x66)
+	_, err := impl.SerializeMessage(obj, 0x66)
 	if err == nil {
 		t.Error("Serializer allowed an Any field to retain a struct")
 	}
+}
+
+func TestSerializeAnyStruct(t *testing.T) {
+	obj := TestSubOther{
+		FieldL: impl.String("hello"),
+	}
+	data, err := impl.SerializeNonMessage(obj)
+	assert.Nil(t, err)
+
+	output := data.Bytes()
+	expectedOutput := []byte{0x2d, 0x1, 0x8, 0x15, 0x1, 0x5, 0x68, 0x65, 0x6c, 0x6c, 0x6f}
+
+	assert.Equal(t, len(output), len(expectedOutput))
+	for i, b := range expectedOutput {
+		assert.Equal(t, b, output[i])
+	}
+}
+
+func TestSerializeAnyEmptyStruct(t *testing.T) {
+	var obj TestSubOther
+	data, err := impl.SerializeNonMessage(obj)
+
+	assert.Nil(t, err)
+
+	output := data.Bytes()
+	expectedOutput := []byte{0x2d, 0x1, 0x1, 0x17}
+
+	assert.Equal(t, len(output), len(expectedOutput))
+	for i, b := range expectedOutput {
+		assert.Equal(t, b, output[i])
+	}
+}
+
+func TestDeserializeAnyStruct(t *testing.T) {
+	data := []byte{0x2d, 0x1, 0x8, 0x15, 0x1, 0x5, 0x68, 0x65, 0x6c, 0x6c, 0x6f}
+	res, err := impl.DeserializeNonMessage(data, TestSubOther{})
+	assert.Nil(t, err)
+	assert.NotNil(t, res)
+	actualResult := res.(*TestSubOther)
+	assert.Equal(t, "hello", actualResult.FieldL.Value)
 }

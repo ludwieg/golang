@@ -27,7 +27,7 @@ func serializeStruct(c *serializationCandidate, b *bytes.Buffer) error {
 		return fmt.Errorf("illegal attempt to serialize a non-serializable type %#v", reflectValue)
 	}
 
-	// Here we can safely convert it to a Serializable and extract metdata
+	// Here we can safely convert it to a Serializable and extract metadata
 	coercedSerializable := reflectValue.Convert(serializableType).Interface().(Serializable)
 	typeMeta := coercedSerializable.LudwiegMeta()
 
