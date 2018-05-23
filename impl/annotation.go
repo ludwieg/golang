@@ -18,7 +18,7 @@ func (t LudwiegTypeAnnotation) metaProtocolByte() *metaProtocolByte {
 	return &p
 }
 
-// ArrayOf creates a new array annotation with no predefined lenght
+// ArrayOf creates a new array annotation with no predefined length
 func ArrayOf(r interface{}) LudwiegTypeAnnotation {
 	return ArrayOfWithSize(r, "*")
 }

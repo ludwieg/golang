@@ -5,7 +5,7 @@ import "fmt"
 // LudwiegUnknown is just an utility type used to hold information about an
 // unknown type. Currently, it only retains type metadata and a buffer
 // containing the object value. Its decoder returns an error on unknown types
-// that has no prefixed lenght.
+// that has no prefixed length.
 type LudwiegUnknown struct {
 	HasValue bool
 	Value    []byte

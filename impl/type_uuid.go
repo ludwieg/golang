@@ -46,7 +46,7 @@ func serializeUUID(c *serializationCandidate, b *bytes.Buffer) error {
 		i, err := strconv.ParseUint(val[i:end], 16, 8)
 		if err != nil {
 			// Should not happen, since we're validating conformity and
-			// lenght one step behind, but let's leave this here as a sanity
+			// length one step behind, but let's leave this here as a sanity
 			// check.
 			return fmt.Errorf("invalid value %s for UUID field", val)
 		}
