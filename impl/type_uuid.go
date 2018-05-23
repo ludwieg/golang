@@ -33,9 +33,9 @@ func serializeUUID(c *serializationCandidate, b *bytes.Buffer) error {
 		return illegalSetterValueError("uuid")
 	}
 
-	regexp := regexp.MustCompile(`[0-9a-f]+`)
-	val = strings.ToLower(strings.Replace(val, "-", "", 0))
-	if len(val) != 32 || !regexp.Match([]byte(val)) {
+	reg := regexp.MustCompile(`[0-9a-f]+`)
+	val = strings.ToLower(strings.Replace(val, "-", "", -1))
+	if len(val) != 32 || !reg.Match([]byte(val)) {
 		return fmt.Errorf("invalid value %s for UUID field", val)
 	}
 
