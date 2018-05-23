@@ -16,16 +16,16 @@ const (
 	TypeUnknown ProtocolType = 0x00
 
 	// TypeUint8 represents an Uint8 type
-	TypeUint8 = (0x01 << 2)
+	TypeUint8 = 0x01 << 2
 
 	// TypeUint32 represents an Uint32 type
-	TypeUint32 = (0x02 << 2)
+	TypeUint32 = 0x02 << 2
 
 	// TypeUint64 represents an Uint64 type
-	TypeUint64 = (0x03 << 2)
+	TypeUint64 = 0x03 << 2
 
 	// TypeDouble represents a Float64 type
-	TypeDouble = (0x04 << 2)
+	TypeDouble = 0x04 << 2
 
 	// TypeString represents a String type
 	TypeString = (0x05 << 2) | 0x1
@@ -34,13 +34,13 @@ const (
 	TypeBlob = (0x06 << 2) | 0x1
 
 	// TypeBool represents a Bool type
-	TypeBool = (0x07 << 2)
+	TypeBool = 0x07 << 2
 
 	// TypeArray represents an Array type
 	TypeArray = (0x08 << 2) | 0x1
 
 	// TypeUUID represents an UUID type
-	TypeUUID = (0x09 << 2)
+	TypeUUID = 0x09 << 2
 
 	// TypeAny represents any type Ludwieg is capable of handling
 	TypeAny = (0x0A << 2) | 0x1
@@ -50,7 +50,7 @@ const (
 
 	// TypeDynInt represents an Integer value that may assume several sizes and
 	// precisions (byte, uint16, uint32, uint64, float32, float64)
-	TypeDynInt = (0x0C << 2)
+	TypeDynInt = 0x0C << 2
 )
 
 var knownTypes = []ProtocolType{
